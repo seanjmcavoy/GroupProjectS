@@ -1,0 +1,23 @@
+# PathQueue (Working Title)
+
+A grid-based puzzle where you **plan** a sequence of W/A/S/D moves, then press Enter to **execute** and watch a little cube robot follow the plan. Tiles change the rules (ice, sticky, walls, goal), so thinking ahead is key.
+
+## Project structure (systems)
+
+- **GridManager** – Builds a dictionary of tiles from `tilesRoot`. Converts grid ↔ world using `cellSize`.
+- **PlayerController** – Executes the queued commands step-by-step on the grid (lerped movement). Handles tile reactions (slide, sticky, goal).
+- **CommandQueue** – Stores the planned commands; simple API for Add/Pop/Clear and an `OnChanged` event for UI.
+- **GameManager** – Planning/Execution loop: records W/A/S/D, Backspace, Enter/Space, R. Blocks input while Win UI is shown.
+- **Tiles**
+  - `Tile` (base): `IsWalkable` + `OnEnter(player, fromDir)` hook.
+  - `WallTile`: not walkable.
+  - `GoalTile`: calls `player.CompleteLevel()` and opens Win UI.
+  - `IceTile`: sets slide direction so the player keeps moving straight until a non-ice tile.
+  - `StickyTile`: consumes extra commands before the player can move off.
+- **WinUI** – A simple “You Won!” panel with **Restart** and **Next Level** buttons. Pauses time when shown.
+- **Editor/TileTools** – Editor menu utilities for bulk converting selected floor cubes to Goal/Wall/Ice/Sticky.
+
+## Scenes & level flow
+
+- Scenes are named `Level_00`, `Level_01`, `Level_02`, add more current levels are the same... testing level loading. 
+- Add them to **File → Build Settings…** in order:
