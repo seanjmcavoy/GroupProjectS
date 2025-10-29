@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
             Debug.Log($"Run {scratch.Count} commands");
             for (int k = 0; k < scratch.Count; k++) Debug.Log($"[GM] cmd[{k}] = {scratch[k]}");
             player.RunCommands(scratch);
+            queue.Clear();
         }
 
         // Quick test key: fills a tiny path and runs it
