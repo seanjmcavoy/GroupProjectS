@@ -14,10 +14,18 @@ public class GameManager : MonoBehaviour
         if (player.IsExecuting) return;
 
         // Planning
-        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))    queue.Add(Direction.Up);
-        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))  queue.Add(Direction.Down);
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))  queue.Add(Direction.Left);
-        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) queue.Add(Direction.Right);
+        if (player.CanAddCommand(queue.Commands.Count))
+    {
+    if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))    queue.Add(Direction.Up);
+    if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))  queue.Add(Direction.Down);
+    if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))  queue.Add(Direction.Left);
+    if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) queue.Add(Direction.Right);
+    }
+    else
+    {
+    if (Input.anyKeyDown)
+        Debug.Log("Max moves reached!");
+    }
         if (Input.GetKeyDown(KeyCode.Backspace)) queue.PopBack();
         if (Input.GetKeyDown(KeyCode.R)) player.ResetToStart();
 

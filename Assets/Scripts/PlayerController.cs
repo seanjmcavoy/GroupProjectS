@@ -11,6 +11,9 @@ public class PlayerController : MonoBehaviour
     [Header("Motion")]
     public float stepTime = 0.15f;
 
+    [Header("Limits")]
+    public int maxMoves = 3;
+
     public Vector2Int GridPos { get; private set; }
     Vector2Int startGrid;
     bool executing;
@@ -70,6 +73,11 @@ public class PlayerController : MonoBehaviour
         ClearSticky();
         GridPos = startGrid;
         transform.position = grid.WorldFromGrid(GridPos, baseY);
+    }
+
+    public bool CanAddCommand(int currentCount)
+    {
+        return currentCount < maxMoves;
     }
 
     public void RunCommands(IReadOnlyList<Direction> commands)
