@@ -7,6 +7,7 @@ public class IceTile : Tile
     public override IEnumerator OnEnter(PlayerController player, Direction fromDir)
     {
         player.SetSlide(fromDir);
+        Debug.Log("SLideeee");
         yield break;
     }
 }
