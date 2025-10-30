@@ -67,6 +67,8 @@ public class PlayerController : MonoBehaviour
 
     public void ResetToStart()
     {
+        // maybe fix to let reset while other stuff going on?
+        StopAllCoroutines();
         executing = false;
         levelComplete = false;
         ClearSlide();
