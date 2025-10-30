@@ -9,6 +9,7 @@ public class StickyTile : Tile
 
     public override IEnumerator OnEnter(PlayerController player, Direction fromDir)
     {
+        Debug.Log("sticky");
         player.SetSticky(extraCommandCost);
         yield break;
     }
