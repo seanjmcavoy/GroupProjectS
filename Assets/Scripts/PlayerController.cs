@@ -159,8 +159,6 @@ public class PlayerController : MonoBehaviour
 
                     GridPos = target;
 
-                    // Arrived: if we left ice onto normal, stop sliding
-                    if (!(targetTile is IceTile)) ClearSlide();
 
                     // Tile reaction
                     yield return targetTile.OnEnter(this, next);
@@ -185,8 +183,6 @@ public class PlayerController : MonoBehaviour
             }
 
             GridPos = target;
-
-            if (!(targetTile is IceTile)) ClearSlide();
 
             yield return targetTile.OnEnter(this, next);
 

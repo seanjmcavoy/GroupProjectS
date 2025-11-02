@@ -13,9 +13,6 @@ public static class TileTools
     [MenuItem("PathQueue/Tiles/Convert Selected To/WallTile")]
     public static void ToWall() => ConvertSelectionTo<WallTile>();
 
-    [MenuItem("PathQueue/Tiles/Convert Selected To/IceTile")]
-    public static void ToIce() => ConvertSelectionTo<IceTile>();
-
     [MenuItem("PathQueue/Tiles/Convert Selected To/StickyTile")]
     public static void ToSticky() => ConvertSelectionTo<StickyTile>();
 
@@ -29,9 +26,6 @@ public static class TileTools
     [MenuItem("GameObject/PathQueue/Convert Selected To/WallTile", false, 10)]
     public static void GO_ToWall(MenuCommand cmd) => ToWall();
 
-    [MenuItem("GameObject/PathQueue/Convert Selected To/IceTile", false, 10)]
-    public static void GO_ToIce(MenuCommand cmd) => ToIce();
-
     [MenuItem("GameObject/PathQueue/Convert Selected To/StickyTile", false, 10)]
     public static void GO_ToSticky(MenuCommand cmd) => ToSticky();
 
@@ -44,8 +38,6 @@ public static class TileTools
     [MenuItem("CONTEXT/Tile/Convert To/WallTile")]
     public static void CTX_ToWall(MenuCommand cmd) => ConvertGameObject(((Tile)cmd.context).gameObject, typeof(WallTile));
 
-    [MenuItem("CONTEXT/Tile/Convert To/IceTile")]
-    public static void CTX_ToIce(MenuCommand cmd) => ConvertGameObject(((Tile)cmd.context).gameObject, typeof(IceTile));
 
     [MenuItem("CONTEXT/Tile/Convert To/StickyTile")]
     public static void CTX_ToSticky(MenuCommand cmd) => ConvertGameObject(((Tile)cmd.context).gameObject, typeof(StickyTile));
