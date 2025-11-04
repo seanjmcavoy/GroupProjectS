@@ -25,7 +25,6 @@ public class PlayerController : MonoBehaviour
     bool lastStepSucceeded;
 
     // Tile effects
-    Direction? slideDir = null;
     int stickyExtraCost = 0;
 
     float baseY; // keep current Y
@@ -53,7 +52,6 @@ public class PlayerController : MonoBehaviour
         levelComplete = true;
         executing = false;
         StopAllCoroutines();
-        ClearSlide();
         ClearSticky();
         //StartCoroutine(ReloadAfter(1f));
     }
@@ -64,20 +62,18 @@ public class PlayerController : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
+    public void SetSticky(int extraCost) => stickyExtraCost = Mathf.Max(stickyExtraCost, extraCost);
+    public void ClearSticky() => stickyExtraCost = 0;
+
     public void SetSlide(Direction dir)
     {
-        slideDir = dir;
         enableSlideMode = true;
     }
 
     public void ClearSlide()
     {
-        slideDir = null;
         enableSlideMode = false;
     }
-
-    public void SetSticky(int extraCost) => stickyExtraCost = Mathf.Max(stickyExtraCost, extraCost);
-    public void ClearSticky() => stickyExtraCost = 0;
 
     public void ResetToStart()
     {
@@ -85,7 +81,6 @@ public class PlayerController : MonoBehaviour
         StopAllCoroutines();
         executing = false;
         levelComplete = false;
-        ClearSlide();
         ClearSticky();
         GridPos = startGrid;
         transform.position = grid.WorldFromGrid(GridPos, baseY);
@@ -109,48 +104,43 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator Execute(IReadOnlyList<Direction> commands)
     {
-        ClearSlide();
         ClearSticky();
         executing = true;
         outOfBoundsHit = false;
 
         var i = 0;
-        while (!levelComplete)
+        while (i < commands.Count && !levelComplete)
         {
-            bool usingSlide = enableSlideMode && slideDir.HasValue;
-            Direction next;
-            if (usingSlide)
+            Direction dir = commands[i];
+            i++;
+
+            if (stickyExtraCost > 0)
             {
-                next = slideDir.Value;
+                stickyExtraCost--;
+                yield return new WaitForSeconds(stepTime);
+                continue;
+            }
+
+            if (enableSlideMode)
+            {
+                // Continue sliding until you hit a wall or a non-walkable tile.
+                while (TryResolveStep(dir, out var target, out var tile) && !levelComplete)
+                {
+                    yield return StepTo(target);
+                    GridPos = target;
+                    yield return tile.OnEnter(this, dir);
+                    if (!tile.IsWalkable) break;
+                }
             }
             else
             {
-                if (i >= commands.Count) break; // out of commands
-                next = commands[i];
-
-                // Sticky: consume extra commands without moving
-                if (stickyExtraCost > 0)
+                if (!TryResolveStep(dir, out var target, out var tile))
                 {
-                    stickyExtraCost--;
-                    i++; // consume one
-                    yield return new WaitForSeconds(stepTime);
-                    continue;
+                    break; // hit wall
                 }
-
-                i++;
-            }
-
-            yield return MoveAlong(next);
-
-            if (!lastStepSucceeded)
-            {
-                slideDir = null;
-                break;
-            }
-
-            if (levelComplete)
-            {
-                break;
+                yield return StepTo(target);
+                GridPos = target;
+                yield return tile.OnEnter(this, dir);
             }
         }
 
@@ -169,14 +159,20 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator MoveAlong(Direction dir)
     {
-        if (!TryResolveStep(dir, out var target, out var targetTile))
+        if (!TryResolveStep(dir, out var target, out var tile))
         {
             lastStepSucceeded = false;
             yield break;
         }
 
         lastStepSucceeded = true;
+        yield return StepTo(target);
+        GridPos = target;
+        yield return tile.OnEnter(this, dir);
+    }
 
+    IEnumerator StepTo(Vector2Int target)
+    {
         var from = transform.position;
         var to = grid.WorldFromGrid(target, baseY);
         var t = 0f;
@@ -186,11 +182,6 @@ public class PlayerController : MonoBehaviour
             transform.position = Vector3.Lerp(from, to, Mathf.Clamp01(t));
             yield return null;
         }
-
-        GridPos = target;
-
-        ClearSlide();
-        yield return targetTile.OnEnter(this, dir);
     }
 
     bool TryResolveStep(Direction dir, out Vector2Int target, out Tile targetTile)

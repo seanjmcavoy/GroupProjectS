@@ -55,7 +55,8 @@ public class RisingTile : Tile
 
         if (!hasRisen)
         {
-            yield return RiseRoutine();
+            yield return null; // Delay by one frame, until the player completes the current movement.
+            StartCoroutine(RiseRoutine());
         }
     }
 
