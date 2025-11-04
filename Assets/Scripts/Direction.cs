@@ -15,4 +15,16 @@ public static class DirectionExtensions
             default:              return Vector2Int.zero;
         }
     }
+
+    public static Direction Opposite(this Direction d)
+    {
+        switch (d)
+        {
+            case Direction.Up:    return Direction.Down;
+            case Direction.Down:  return Direction.Up;
+            case Direction.Left:  return Direction.Right;
+            case Direction.Right: return Direction.Left;
+            default:              return d;
+        }
+    }
 }

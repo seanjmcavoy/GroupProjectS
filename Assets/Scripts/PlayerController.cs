@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     bool executing;
     bool levelComplete;
     bool outOfBoundsHit = false;
+    bool lastStepSucceeded;
 
     // Tile effects
     Direction? slideDir = null;
@@ -44,16 +45,16 @@ public class PlayerController : MonoBehaviour
     }
 
     public bool IsExecuting => executing;
+    public bool LastStepSucceeded => lastStepSucceeded;
 
     public void CompleteLevel()
     {
         if (levelComplete) return;
         levelComplete = true;
         executing = false;
-        StopAllCoroutines(); 
+        StopAllCoroutines();
         ClearSlide();
         ClearSticky();
-        //to keep resetting after delay
         //StartCoroutine(ReloadAfter(1f));
     }
 
@@ -63,8 +64,17 @@ public class PlayerController : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    public void SetSlide(Direction dir) => slideDir = dir;
-    public void ClearSlide() => slideDir = null;
+    public void SetSlide(Direction dir)
+    {
+        slideDir = dir;
+        enableSlideMode = true;
+    }
+
+    public void ClearSlide()
+    {
+        slideDir = null;
+        enableSlideMode = false;
+    }
 
     public void SetSticky(int extraCost) => stickyExtraCost = Mathf.Max(stickyExtraCost, extraCost);
     public void ClearSticky() => stickyExtraCost = 0;
@@ -82,9 +92,8 @@ public class PlayerController : MonoBehaviour
 
         foreach (var tile in FindObjectsByType<RisingTile>(FindObjectsSortMode.None))
         {
-        tile.ResetTile();
+            tile.ResetTile();
         }
-  
     }
 
     public bool CanAddCommand(int currentCount)
@@ -108,9 +117,9 @@ public class PlayerController : MonoBehaviour
         var i = 0;
         while (!levelComplete)
         {
-            // Decide next direction
+            bool usingSlide = enableSlideMode && slideDir.HasValue;
             Direction next;
-            if (slideDir.HasValue)
+            if (usingSlide)
             {
                 next = slideDir.Value;
             }
@@ -131,70 +140,69 @@ public class PlayerController : MonoBehaviour
                 i++;
             }
 
+            yield return MoveAlong(next);
 
-            if (enableSlideMode)
+            if (!lastStepSucceeded)
             {
-                while (true)
-                {
-                    var target = GridPos + next.ToOffset();
-                    Debug.Log($"[Player] step {i} dir={next} from={GridPos} to={target}");
-
-                    // Check walkability
-                    if (!grid.TryGetTile(target, out var targetTile) || !targetTile.IsWalkable)
-                    {
-                        // hit wall/out of bounds → fail & reset
-                        break;
-                    }
-
-                    // Move with a small lerp
-                    var from = transform.position;
-                    var to = grid.WorldFromGrid(target, baseY);
-                    var t = 0f;
-                    while (t < 1f)
-                    {
-                        t += Time.deltaTime / stepTime;
-                        transform.position = Vector3.Lerp(from, to, Mathf.Clamp01(t));
-                        yield return null;
-                    }
-
-                    GridPos = target;
-
-
-                    // Tile reaction
-                    yield return targetTile.OnEnter(this, next);
-                    if (levelComplete) break;
-                }
-            }
-        else
-         {
-            var target = GridPos + next.ToOffset();
-
-            if (!grid.TryGetTile(target, out var targetTile) || !targetTile.IsWalkable)
+                slideDir = null;
                 break;
-
-            var from = transform.position;
-            var to = grid.WorldFromGrid(target, baseY);
-            var t = 0f;
-            while (t < 1f)
-            {
-                t += Time.deltaTime / stepTime;
-                transform.position = Vector3.Lerp(from, to, Mathf.Clamp01(t));
-                yield return null;
             }
 
-            GridPos = target;
-
-            yield return targetTile.OnEnter(this, next);
-
-            if (levelComplete) break;
+            if (levelComplete)
+            {
+                break;
+            }
         }
-    }
 
-                // If didn’t win, reset to start
-                if (!levelComplete) ResetToStart();
-        
-        
+        if (!levelComplete)
+        {
+            ResetToStart();
+        }
 
         executing = false;
+    }
+
+    public IEnumerator ForceStep(Direction dir)
+    {
+        yield return MoveAlong(dir);
+    }
+
+    IEnumerator MoveAlong(Direction dir)
+    {
+        if (!TryResolveStep(dir, out var target, out var targetTile))
+        {
+            lastStepSucceeded = false;
+            yield break;
+        }
+
+        lastStepSucceeded = true;
+
+        var from = transform.position;
+        var to = grid.WorldFromGrid(target, baseY);
+        var t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / stepTime;
+            transform.position = Vector3.Lerp(from, to, Mathf.Clamp01(t));
+            yield return null;
+        }
+
+        GridPos = target;
+
+        ClearSlide();
+        yield return targetTile.OnEnter(this, dir);
+    }
+
+    bool TryResolveStep(Direction dir, out Vector2Int target, out Tile targetTile)
+    {
+        target = GridPos + dir.ToOffset();
+        if (!grid.TryGetTile(target, out targetTile) || !targetTile.IsWalkable)
+        {
+            outOfBoundsHit = true;
+            return false;
+        }
+
+        outOfBoundsHit = false;
+        return true;
     }
 }

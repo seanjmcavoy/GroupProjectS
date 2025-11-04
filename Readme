@@ -4,20 +4,31 @@ A grid-based puzzle where you **plan** a sequence of W/A/S/D moves, then press E
 
 ## Project structure (systems)
 
-- **GridManager** â€“ Builds a dictionary of tiles from `tilesRoot`. Converts grid â†” world using `cellSize`.
-- **PlayerController** â€“ Executes the queued commands step-by-step on the grid (lerped movement). Handles tile reactions (slide, sticky, goal).
-- **CommandQueue** â€“ Stores the planned commands; simple API for Add/Pop/Clear and an `OnChanged` event for UI.
-- **GameManager** â€“ Planning/Execution loop: records W/A/S/D, Backspace, Enter/Space, R. Blocks input while Win UI is shown.
+- **GridManager** – Builds a dictionary of tiles from `tilesRoot`. Converts grid <-> world using `cellSize`.
+- **PlayerController** – Executes the queued commands step-by-step on the grid (lerped movement). Handles tile reactions (slide, sticky, hazards, goal).
+- **CommandQueue** – Stores the planned commands; simple API for Add/Pop/Clear and an `OnChanged` event for UI.
+- **GameManager** – Planning/execution loop: records W/A/S/D, Backspace, Enter/Space, R. Blocks input while Win UI is shown.
 - **Tiles**
-  - `Tile` (base): `IsWalkable` + `OnEnter(player, fromDir)` hook.
-  - `WallTile`: not walkable.
-  - `GoalTile`: calls `player.CompleteLevel()` and opens Win UI.
-  - `IceTile`: sets slide direction so the player keeps moving straight until a non-ice tile.
-  - `StickyTile`: consumes extra commands before the player can move off.
-- **WinUI** â€“ A simple â€œYou Won!â€ panel with **Restart** and **Next Level** buttons. Pauses time when shown.
-- **Editor/TileTools** â€“ Editor menu utilities for bulk converting selected floor cubes to Goal/Wall/Ice/Sticky.
+  - `Tile` (base): Manages walkability, `OnEnter`, automatic tinting, and optional SFX/particle feedback hooks.
+  - `WallTile`: Not walkable.
+  - `GoalTile`: Calls `player.CompleteLevel()` and opens Win UI (tinted green).
+  - `IceTile`: Sets slide direction so the player keeps moving straight until a non-ice tile (icy blue tint).
+  - `StickyTile`: Consumes extra commands before the player can move off (amber tint).
+  - `FireTile`: Immediate reset on contact (hot red tint).
+  - `GlassTile`: Fragile reset trigger (pale cyan tint).
+  - `SpringTile`: Launches the player forward/back for a configurable number of tiles.
+  - `RisingTile`: Cycles up/down automatically for timed obstacles (toggle auto-cycle off to trigger manually).
+- **WinUI** – A "You Won!" panel with Restart/Next Level buttons. Pauses time when shown.
+- **Editor/TileTools** – Editor menu utilities for bulk converting selected floor cubes between all tile types.
 
 ## Scenes & level flow
 
-- Scenes are named `Level_00`, `Level_01`, `Level_02`, add more current levels are the same... testing level loading. 
-- Add them to **File â†’ Build Settingsâ€¦** in order:
+- Scenes are named `Level_00`, `Level_01`, `Level_02`, etc.
+- Add them to **File > Build Settings** in order.
+
+## Recent additions
+
+- Tile tinting is automatic per tile type with optional overrides in the Inspector.
+- Tile SFX now use configurable volume/pitch and play as 2D audio by default so feedback is clearer.
+- Rising tiles support continuous cycles (configurable timings) for timed puzzles, while still supporting manual activation when desired.
+- Editor conversion menus expose every tile type from the top bar, hierarchy, and component context menus for faster level authoring.
