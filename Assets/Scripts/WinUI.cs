@@ -12,6 +12,7 @@ public class WinUI : MonoBehaviour
     [Header("Assign in Inspector")]
     [SerializeField] GameObject panel;       // Set inactive by default
     [SerializeField] TMP_Text messageText;   // Optional might not have to use 
+    [SerializeField] TMP_Text levelTitleText; //Level name text
 
     public bool IsOpen => panel && panel.activeSelf;
 
@@ -24,6 +25,11 @@ public class WinUI : MonoBehaviour
 
     public void Show(string msg = "You Won!")
     {
+        if (levelTitleText)
+        {
+        string levelName = SceneManager.GetActiveScene().name;
+        levelTitleText.text = levelName;
+        }
         if (messageText) messageText.text = msg;
         if (panel) panel.SetActive(true);
         Time.timeScale = 0f; // pause gameplay
@@ -39,6 +45,11 @@ public class WinUI : MonoBehaviour
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void ReturnToLevelSelect()
+    {
+        QuitToMenu("LevelSelect"); 
     }
 
     public void NextLevel()
