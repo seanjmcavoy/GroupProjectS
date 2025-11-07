@@ -117,11 +117,20 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5497549839142640678}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 87b000621aed95a4e99e064437834f0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enterEffect: {fileID: 0}
+  enterSfx: {fileID: 0}
+  enterSfxVolume: 2.5
+  sfxAs2D: 1
+  sfxPitch: 1
+  colorTargets:
+  - {fileID: 1715124841616067722}
+  overrideColorInInspector: 0
+  inspectorColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &4926366388301823957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -134,3 +143,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 070f56036811b6440a89713610ad3c27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enterEffect: {fileID: 0}
+  enterSfx: {fileID: 0}
+  enterSfxVolume: 2.5
+  sfxAs2D: 1
+  sfxPitch: 1
+  colorTargets:
+  - {fileID: 1715124841616067722}
+  overrideColorInInspector: 0
+  inspectorColor: {r: 1, g: 1, b: 1, a: 1}
