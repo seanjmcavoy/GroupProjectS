@@ -20,6 +20,9 @@ A grid-based puzzle where you **plan** a sequence of W/A/S/D moves, then press E
   - `RisingTile`: Cycles up/down automatically for timed obstacles (toggle auto-cycle off to trigger manually).
 - **WinUI** – A "You Won!" panel with Restart/Next Level buttons. Pauses time when shown.
 - **Editor/TileTools** – Editor menu utilities for bulk converting selected floor cubes between all tile types.
+- **AI Systems**
+  - `AIChaser`: Grid-aware enemy that continually replans a path to the player using the shared pathfinder and triggers a reset on contact.
+  - `HintPathVisualizer`: Runs a stateful HintSimulator (A* + tile-effect simulation) to highlight a valid command sequence on demand.
 
 ## Scenes & level flow
 
@@ -32,3 +35,4 @@ A grid-based puzzle where you **plan** a sequence of W/A/S/D moves, then press E
 - Tile SFX now use configurable volume/pitch and play as 2D audio by default so feedback is clearer.
 - Rising tiles support continuous cycles (configurable timings) for timed puzzles, while still supporting manual activation when desired.
 - Editor conversion menus expose every tile type from the top bar, hierarchy, and component context menus for faster level authoring.
+- Added AI helpers: a chaser enemy that uses grid pathfinding, and an on-demand hint system that simulates real tile effects (slide, sticky, rising, spring) to display a safe path.

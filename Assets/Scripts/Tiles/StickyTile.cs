@@ -6,6 +6,7 @@ public class StickyTile : Tile
 {
     [SerializeField, Tooltip("Extra commands consumed before moving off this tile")]
     int extraCommandCost = 1;
+    public int ExtraCommandCost => extraCommandCost;
 
     protected override Color DefaultColor => new Color(0.88f, 0.58f, 0.18f);
 

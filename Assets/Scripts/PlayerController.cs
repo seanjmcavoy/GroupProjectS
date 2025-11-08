@@ -16,13 +16,17 @@ public class PlayerController : MonoBehaviour
 
     [Header("Mode")]
     public bool enableSlideMode = false;
+    [Tooltip("If true, player always behaves as if on ice (levels 7-9).")]
+    public bool forceSlideMode = false;
+    [Tooltip("When false the player stays where a failed run ends (used for Level 10).")]
+    public bool resetOnFailedRun = true;
 
     public Vector2Int GridPos { get; private set; }
     Vector2Int startGrid;
     bool executing;
     bool levelComplete;
-    bool outOfBoundsHit = false;
     bool lastStepSucceeded;
+    Direction? currentSlideDir;
 
     // Tile effects
     int stickyExtraCost = 0;
@@ -32,6 +36,8 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         baseY = transform.position.y;
+        if (forceSlideMode)
+            enableSlideMode = true;
 
         // infer starting grid from position
         var lp = grid.transform.InverseTransformPoint(transform.position);
@@ -67,12 +73,15 @@ public class PlayerController : MonoBehaviour
 
     public void SetSlide(Direction dir)
     {
+        currentSlideDir = dir;
         enableSlideMode = true;
     }
 
     public void ClearSlide()
     {
-        enableSlideMode = false;
+        currentSlideDir = null;
+        if (!forceSlideMode)
+            enableSlideMode = false;
     }
 
     public void ResetToStart()
@@ -85,7 +94,12 @@ public class PlayerController : MonoBehaviour
         GridPos = startGrid;
         transform.position = grid.WorldFromGrid(GridPos, baseY);
 
-        foreach (var tile in FindObjectsByType<RisingTile>(FindObjectsSortMode.None))
+#if UNITY_2023_1_OR_NEWER
+        var risers = FindObjectsByType<RisingTile>(FindObjectsSortMode.None);
+#else
+        var risers = FindObjectsOfType<RisingTile>();
+#endif
+        foreach (var tile in risers)
         {
             tile.ResetTile();
         }
@@ -106,30 +120,81 @@ public class PlayerController : MonoBehaviour
     {
         ClearSticky();
         executing = true;
-        outOfBoundsHit = false;
 
         var i = 0;
-        while (i < commands.Count && !levelComplete)
+        while (!levelComplete)
         {
-            Direction dir = commands[i];
-            i++;
+            Direction dir;
 
-            if (stickyExtraCost > 0)
+            if (currentSlideDir.HasValue)
             {
-                stickyExtraCost--;
-                yield return new WaitForSeconds(stepTime);
-                continue;
+                dir = currentSlideDir.Value;
+            }
+            else
+            {
+                if (i >= commands.Count)
+                {
+                    break;
+                }
+
+                dir = commands[i];
+                i++;
+
+                if (stickyExtraCost > 0)
+                {
+                    stickyExtraCost--;
+                    yield return new WaitForSeconds(stepTime);
+                    continue;
+                }
             }
 
             if (enableSlideMode)
             {
-                // Continue sliding until you hit a wall or a non-walkable tile.
-                while (TryResolveStep(dir, out var target, out var tile) && !levelComplete)
+                bool continueSliding = true;
+                bool blocked = false;
+
+                while (continueSliding && !levelComplete)
                 {
+                    if (!TryResolveStep(dir, out var target, out var tile))
+                    {
+                        blocked = true;
+                        currentSlideDir = null;
+                        break;
+                    }
+
                     yield return StepTo(target);
                     GridPos = target;
+
+                    currentSlideDir = null;
                     yield return tile.OnEnter(this, dir);
-                    if (!tile.IsWalkable) break;
+
+                    if (!enableSlideMode)
+                    {
+                        continueSliding = false;
+                        break;
+                    }
+
+                    if (currentSlideDir.HasValue)
+                    {
+                        dir = currentSlideDir.Value;
+                    }
+                    else if (forceSlideMode)
+                    {
+                        currentSlideDir = dir;
+                    }
+                    else
+                    {
+                        continueSliding = false;
+                    }
+                }
+
+                if (blocked)
+                {
+                    currentSlideDir = null;
+                    if (!forceSlideMode)
+                    {
+                        ClearSlide();
+                    }
                 }
             }
             else
@@ -146,7 +211,15 @@ public class PlayerController : MonoBehaviour
 
         if (!levelComplete)
         {
-            ResetToStart();
+            if (resetOnFailedRun)
+            {
+                ResetToStart();
+            }
+            else
+            {
+                ClearSlide();
+                ClearSticky();
+            }
         }
 
         executing = false;
@@ -189,11 +262,9 @@ public class PlayerController : MonoBehaviour
         target = GridPos + dir.ToOffset();
         if (!grid.TryGetTile(target, out targetTile) || !targetTile.IsWalkable)
         {
-            outOfBoundsHit = true;
             return false;
         }
 
-        outOfBoundsHit = false;
         return true;
     }
 }
