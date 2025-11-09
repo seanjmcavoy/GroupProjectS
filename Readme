@@ -35,5 +35,6 @@ A grid-based puzzle where you **plan** a sequence of W/A/S/D moves, then press E
 - Tile SFX now use configurable volume/pitch and play as 2D audio by default so feedback is clearer.
 - Rising tiles support continuous cycles (configurable timings) for timed puzzles, while still supporting manual activation when desired.
 - Editor conversion menus expose every tile type from the top bar, hierarchy, and component context menus for faster level authoring.
-- Added AI helpers: a chaser enemy that uses grid pathfinding, and an on-demand hint system that simulates real tile effects (slide, sticky, rising, spring) to display a safe path.
-- Level 11 roadmap: AI-assisted 10×10 procedural generator that rerolls layouts on click, validates solvability with the pathfinder, respects difficulty knobs, and can expose RNG seeds for reproducible runs.
+- Added AI helpers: a chaser enemy that uses grid pathfinding.
+-Hint system, replicates real tile effects (slide, sticky, rising, spring) to display a safe path.
+- Level 11 roadmap: AI-assisted 7×7 procedural generator that rerolls layouts on click, validates solvability with the pathfinder, respects difficulty knobs.
