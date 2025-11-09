@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
     public bool enableSlideMode = false;
     [Tooltip("If true, player always behaves as if on ice (levels 7-9).")]
     public bool forceSlideMode = false;
-    [Tooltip("When false the player stays where a failed run ends (used for Level 10).")]
+    [Tooltip("When false the player stays where a failed run ends (used for Level 10+).")]
     public bool resetOnFailedRun = true;
 
     public Vector2Int GridPos { get; private set; }
@@ -82,6 +82,15 @@ public class PlayerController : MonoBehaviour
         currentSlideDir = null;
         if (!forceSlideMode)
             enableSlideMode = false;
+    }
+
+    public void TeleportTo(Vector2Int gridPos, bool setAsStart)
+    {
+        GridPos = gridPos;
+        if (setAsStart) startGrid = gridPos;
+        transform.position = grid.WorldFromGrid(gridPos, baseY);
+        ClearSlide();
+        ClearSticky();
     }
 
     public void ResetToStart()

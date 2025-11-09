@@ -8,25 +8,32 @@ public class GridManager : MonoBehaviour
 
     readonly Dictionary<Vector2Int, Tile> tiles = new Dictionary<Vector2Int, Tile>();
     public float CellSize => cellSize;
+    public Transform TilesRoot => tilesRoot;
 
     void Awake()
     {
+        RebuildTiles();
+    }
+
+    public void RebuildTiles()
+    {
         tiles.Clear();
-        foreach (var tile in tilesRoot.GetComponentsInChildren<Tile>())
+        if (!tilesRoot) return;
+
+        var allTiles = tilesRoot.GetComponentsInChildren<Tile>(true);
+        foreach (var tile in allTiles)
         {
+            if (tile == null) continue;
             tile.Grid = this;
 
-            // infer grid from local position
             var lp = transform.InverseTransformPoint(tile.transform.position);
             var gx = Mathf.RoundToInt(lp.x / cellSize);
             var gy = Mathf.RoundToInt(lp.z / cellSize);
 
             tile.GridPos = new Vector2Int(gx, gy);
             tiles[tile.GridPos] = tile;
-            
-
         }
-        Debug.Log($"[Grid] Tiles found: {tilesRoot.GetComponentsInChildren<Tile>().Length}, cellSize={cellSize}");
+        Debug.Log($"[Grid] Tiles found: {allTiles.Length}, cellSize={cellSize}");
     }
  
     public bool TryGetTile(Vector2Int gridPos, out Tile tile) => tiles.TryGetValue(gridPos, out tile);
