@@ -583,26 +583,26 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Player:  move one space at a time according to the input movement command.
+  m_text: 'Player:  Green colour, move one space at a time,
 
-    Ice-Player:
-    Blue colour, once it starts moving, it will continue to slide until it hits a
-    wall or edge before stopping.
+    Ice-Player: Blue
+    colour, once it starts moving will continue to slide until it hits a wall or
+    edge before stopping.
 
-    Fire Tile: Red colour, player will  fail upon
-    contact.
+    AI enemy: Brown colour, auto move, when player touch
+    it will fail.
 
-    Glass Tile: It is transparent, can only be passed through once;
-    it will break after passing through.
+    Fire Tile: Red colour, player will  fail when contact.
 
-    Rise Tile: After player passes through,
-    will rise up and become a wall.
+    Ice
+    Tile: Will go straight until to edge or normal tile.
 
-    Sticky Tile: Green colour, after a player
-    enters, their next action will be delayed by one step.
+    Rise Tile: Black colour,
+    after player passes through, will rise up and become a wall.
 
-    Wall: It is impassable
-    and will block the player''s movement.'
+    Sticky Tile:
+    Yellow colour, after a player enters, their next action will be delayed by one
+    step.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -629,7 +629,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 19.95
+  m_fontSize: 21.8
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1

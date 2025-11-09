@@ -1107,10 +1107,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 70975218}
     m_Modifications:
-    - target: {fileID: 919132149155446097, guid: 55a7154760840453cbf09a19f950e2f8, type: 3}
-      propertyPath: m_Name
-      value: UFO
-      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 55a7154760840453cbf09a19f950e2f8, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.25
@@ -1166,6 +1162,10 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 55a7154760840453cbf09a19f950e2f8, type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 55a7154760840453cbf09a19f950e2f8, type: 3}
+      propertyPath: m_Name
+      value: UFO
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2068,6 +2068,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5918012820730946633, guid: d1c202720688e604d9625955c2ec1e44, type: 3}
       propertyPath: autoCycle
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5918012820730946633, guid: d1c202720688e604d9625955c2ec1e44, type: 3}
+      propertyPath: inspectorColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5918012820730946633, guid: d1c202720688e604d9625955c2ec1e44, type: 3}
+      propertyPath: inspectorColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5918012820730946633, guid: d1c202720688e604d9625955c2ec1e44, type: 3}
+      propertyPath: inspectorColor.r
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6515809596533161699, guid: d1c202720688e604d9625955c2ec1e44, type: 3}
